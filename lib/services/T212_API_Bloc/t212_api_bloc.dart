@@ -24,7 +24,7 @@ class T212ApiBloc extends Bloc<T212ApiEvent, T212ApiState> {
   }
 
   void _getAccountDataEvent(GetAccountDataEvent event, Emitter<T212ApiState> emit) async {
-    String tempAPI_key = '5035198ZLvgNiDKqcFzudYTVwdWnBEwCXsMU';
+    String tempAPI_key = 'YOur_Key';
 
     print('hello');
 
