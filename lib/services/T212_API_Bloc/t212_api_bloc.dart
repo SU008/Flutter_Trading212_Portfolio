@@ -7,6 +7,7 @@ import 'package:meta/meta.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart'; //for .env file
+import 'package:easy_debounce/easy_debounce.dart';//debounce
 
 
 import '../../data_models/account_cash_model.dart';
@@ -17,7 +18,7 @@ part 't212_api_state.dart';
 
 class T212ApiBloc extends Bloc<T212ApiEvent, T212ApiState> {
 
-  final Throttle throttle = Throttle(const Duration(seconds: 1), initialValue: ''); // 1 call per second
+  final Throttle throttle = Throttle(const Duration(milliseconds: 300), initialValue: ''); // 1 call per second
 
 
   T212ApiBloc() : super(T212ApiInitial()) {
@@ -32,8 +33,6 @@ class T212ApiBloc extends Bloc<T212ApiEvent, T212ApiState> {
 
     await dotenv.load(); //done in main.dart instead
     String tempAPI_key = dotenv.env['API_KEY'] ?? "Your_API_Key_During_Testing";
-
-
 
     emit(LoadingState());
     var theUrl = Uri.parse('https://live.trading212.com/api/v0/equity/account/cash');
@@ -52,7 +51,6 @@ class T212ApiBloc extends Bloc<T212ApiEvent, T212ApiState> {
       print("map data: $data");
 
       AccountCash accountCash = AccountCash.fromJson(data);
-
 
       print("AccountCash successfully decoded: $accountCash"); // Add this line
 

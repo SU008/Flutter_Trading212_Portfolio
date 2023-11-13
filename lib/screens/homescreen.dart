@@ -20,106 +20,15 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: const Text('Trading 212 Portfolio'),
       ),
-      body: Card(
-
-        elevation: 5, // Optional: Add elevation for a shadow effect
-        color: Colors.blue[200],
-        shape: RoundedRectangleBorder(
-          borderRadius:
-          BorderRadius.circular(15.0), // Adjust the radius as needed
-        ),
-        child: Container(
-          height: 500,
-          padding: const EdgeInsets.all(16.0),
-          child: BlocBuilder<T212ApiBloc, T212ApiState>(
-            builder: (context, state) {
-              if (state is ErrorState){
-                const Center(child: Text('Error while fetch data'));
-              }
-
-              if (state is LoadingState) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (state is PersonalPortfolioLoadedStateModel) {
-                AccountCash accountcash = state.data;
-
-                print(accountcash);
-                return  Column(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(10, 8, 8, 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text('Values shown are all approximate*', textScaleFactor: 0.8,),
-                        ],
-                      ),
-                    ),
-
-                    Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                        BorderRadius.circular(12.0), // Adjust the radius as needed
-                      ),
-                      child: SizedBox(
-                        height: 90,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                      'Account Value : ${accountcash.total}'),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Column(
-
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text('Portfolio : ${accountcash.invested.toDouble() + accountcash.ppl.toDouble()}'),
-                                      Text('Invested : ${accountcash.invested }'),
-
-                                    ],
-                                  ),
-                                  Column(
-
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text('Free Funds : ${accountcash.free} '),
-                                      Text('Profit/Loss : ${accountcash.ppl} '),
-
-                                    ],
-
-                                  ),
-                                ],
-
-                              )
-
-
-
-
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-
-
-              } else {
-                return const Center(
-                    child: Text('Enter API Key/Press the button to fetch data'));
-              }
-            },
-          ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ShowAccountCash(),
+            Placeholder(),
+            Placeholder(),
+            
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -127,6 +36,118 @@ class _MyHomePageState extends State<MyHomePage> {
           T212apibloc.add(GetAccountDataEventModel());
         },
         child: const Icon(Icons.refresh),
+      ),
+    );
+  }
+}
+
+class ShowAccountCash extends StatelessWidget {
+  const ShowAccountCash({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+
+      elevation: 5, // Optional: Add elevation for a shadow effect
+      color: Colors.blue[200],
+      shape: RoundedRectangleBorder(
+        borderRadius:
+        BorderRadius.circular(15.0), // Adjust the radius as needed
+      ),
+      child: Container(
+        height: 160,
+        padding: const EdgeInsets.all(16.0),
+        child: BlocBuilder<T212ApiBloc, T212ApiState>(
+          builder: (context, state) {
+            if (state is ErrorState){
+              const Center(child: Text('Error while fetch data'));
+            }
+
+            if (state is LoadingState) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is PersonalPortfolioLoadedStateModel) {
+              AccountCash accountcash = state.data;
+              num portfolio = accountcash.invested.toDouble() + accountcash.ppl.toDouble();
+              String myportfolio = portfolio.toStringAsFixed(2);
+
+
+              print(accountcash);
+              return  Column(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(10, 8, 8, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text('Values shown are all approximate*', textScaleFactor: 0.8,),
+                      ],
+                    ),
+                  ),
+
+                  Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                      BorderRadius.circular(12.0), // Adjust the radius as needed
+                    ),
+                    child: SizedBox(
+                      height: 90,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                    'Account Value : ${accountcash.total}'),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Column(
+
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Portfolio : ${myportfolio}'),
+                                    Text('Invested : ${accountcash.invested }'),
+
+                                  ],
+                                ),
+                                Column(
+
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Free Funds : ${accountcash.free} '),
+                                    Text('Profit/Loss : ${accountcash.ppl} '),
+
+                                  ],
+
+                                ),
+                              ],
+
+                            )
+
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+
+
+            } else {
+              return const Center(
+                  child: Text('Enter API Key/Press the button to fetch data'));
+            }
+          },
+        ),
       ),
     );
   }
