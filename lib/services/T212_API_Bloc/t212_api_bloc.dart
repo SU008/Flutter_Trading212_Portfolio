@@ -6,6 +6,8 @@ import 'package:debounce_throttle/debounce_throttle.dart';
 import 'package:meta/meta.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart'; //for .env file
+
 
 import '../../data_models/account_cash_model.dart';
 
@@ -27,7 +29,11 @@ class T212ApiBloc extends Bloc<T212ApiEvent, T212ApiState> {
   }
 
   void _getAccountDataEventModel(GetAccountDataEventModel event, Emitter<T212ApiState> emit) async {
-    String tempAPI_key = '5035198ZLvgNiDKqcFzudYTVwdWnBEwCXsMU';
+
+    await dotenv.load(); //done in main.dart instead
+    String tempAPI_key = dotenv.env['API_KEY'] ?? "Your_API_Key_During_Testing";
+
+
 
     emit(LoadingState());
     var theUrl = Uri.parse('https://live.trading212.com/api/v0/equity/account/cash');
