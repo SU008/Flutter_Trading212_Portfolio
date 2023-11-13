@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:debounce_throttle/debounce_throttle.dart';
+import 'package:flutter_portfolio_dividend/data_models/historical_dividends_model.dart';
 import 'package:meta/meta.dart';
 
 import 'package:http/http.dart' as http;
@@ -26,8 +27,68 @@ class T212ApiBloc extends Bloc<T212ApiEvent, T212ApiState> {
     on<GetAccountDataEvent>(_getAccountDataEvent);
     on<GetAccountDataEventModel>(_getAccountDataEventModel);//useing data model
 
+    on<GetPaidOutDividendsEventModel>(_getPaidOutDividendsEventModel);
+
 
   }
+
+  void _getPaidOutDividendsEventModel(GetPaidOutDividendsEventModel event, Emitter<T212ApiState> emit) async {
+    emit(LoadingState());
+
+    await dotenv.load(); //done in main.dart instead
+    String tempAPI_key = dotenv.env['API_KEY'] ?? "Your_API_Key_During_Testing";
+
+    Map<String, String> queryParameters = {
+      "limit": "50",
+    };
+
+    var target_headers = {
+      "Authorization": tempAPI_key,
+      "Content-Type":"application/json",
+    };
+
+    Uri theUrl = Uri.parse('https://live.trading212.com/api/v0/history/dividends').replace(queryParameters: queryParameters);
+
+    print('the url is : $theUrl');
+    final response = await http.get(theUrl, headers: target_headers); //sending a get
+    print('dividends response code: ${response.statusCode}');
+
+    try {
+      if (response.statusCode == 200) {
+        // Decode the JSON response into an instance of AccountCash
+
+        Map<String, dynamic> data = json.decode(response.body);
+
+        HistoricalDividends divhistory = HistoricalDividends.fromJson( json.decode(response.body));
+
+        //final Map<String, dynamic> data = json.decode(response.body);
+        print("Dividend map data: ${data}");
+        print("Dividend map data: ${divhistory.items}");
+
+        emit(PaidOutDividendsStateModel(divhistory));
+
+      } else {
+        emit(ErrorState());
+        print('failed to fetch data');
+        throw Exception("Failed to fetch data: ${response.statusCode}");
+      }
+    } catch (e) {
+      print('failed to fetch data [e]');
+      emit(ErrorState());
+      print("Error decoding JSON or handling response: $e");
+    }
+
+
+
+
+
+
+  }
+
+
+
+
+
 
   void _getAccountDataEventModel(GetAccountDataEventModel event, Emitter<T212ApiState> emit) async {
 
@@ -43,7 +104,7 @@ class T212ApiBloc extends Bloc<T212ApiEvent, T212ApiState> {
     };
 
     final response = await http.get(theUrl, headers: target_headers); //sending a get
-    print(response.statusCode);
+    //print(response.statusCode);
     try {
       if (response.statusCode == 200) {
       // Decode the JSON response into an instance of AccountCash
@@ -52,7 +113,7 @@ class T212ApiBloc extends Bloc<T212ApiEvent, T212ApiState> {
 
       AccountCash accountCash = AccountCash.fromJson(data);
 
-      print("AccountCash successfully decoded: $accountCash"); // Add this line
+      //print("AccountCash successfully decoded: $accountCash"); // Add this line
 
       emit(PersonalPortfolioLoadedStateModel(accountCash));
     } else {

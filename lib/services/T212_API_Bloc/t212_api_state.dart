@@ -11,7 +11,7 @@ class LoadingState extends T212ApiState {}
 class ErrorState extends T212ApiState {}
 
 
-
+//--------------------------
 class PersonalPortfolioLoadedState extends T212ApiState {
   final Map<String, dynamic> data;
 
@@ -24,7 +24,20 @@ class PersonalPortfolioLoadedStateModel extends T212ApiState {
 
   PersonalPortfolioLoadedStateModel(this.data);
 }
+//---------------------------
 
 
+//-------dividend chart---------------
+class PaidOutDividendsState extends T212ApiState {
+  final Map<String, dynamic> data;
 
+  PaidOutDividendsState(this.data);
+}
+
+class PaidOutDividendsStateModel extends T212ApiState {
+  final HistoricalDividends data;
+
+  PaidOutDividendsStateModel(this.data);
+}
+//-----------------------------------
 
