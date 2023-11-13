@@ -1,13 +1,17 @@
 import 'dart:convert';
 //https://app.quicktype.io/
+
+
+
+
 class AccountCash {
-  int blocked;
-  int free;
-  int invested;
-  int pieCash;
-  int ppl;
-  int result;
-  int total;
+  final num blocked;
+  final num free;
+  final num invested;
+  final num pieCash;
+  final num ppl;
+  final num result;
+  final num total;
 
   AccountCash({
     required this.blocked,
@@ -24,13 +28,13 @@ class AccountCash {
   String toRawJson() => json.encode(toJson());
 
   factory AccountCash.fromJson(Map<String, dynamic> json) => AccountCash(
-    blocked: json["blocked"],
-    free: json["free"],
-    invested: json["invested"],
-    pieCash: json["pieCash"],
-    ppl: json["ppl"],
-    result: json["result"],
-    total: json["total"],
+    blocked: json["blocked"] ?? 0 ,
+    free: json["free"] ?? 0 ,
+    invested: json["invested"] ?? 0 ,
+    pieCash: json["pieCash"] ?? 0 ,
+    ppl: json["ppl"] ?? 0 ,
+    result: json["result"] ?? 0,
+    total: json["total"] ?? 0 ,
   );
 
   Map<String, dynamic> toJson() => {
@@ -43,3 +47,5 @@ class AccountCash {
     "total": total,
   };
 }
+
+

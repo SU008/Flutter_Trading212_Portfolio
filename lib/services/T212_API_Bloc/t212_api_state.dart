@@ -18,5 +18,13 @@ class PersonalPortfolioLoadedState extends T212ApiState {
   PersonalPortfolioLoadedState(this.data);
 }
 
+//usind data model as return type
+class PersonalPortfolioLoadedStateModel extends T212ApiState {
+  final AccountCash data;
+
+  PersonalPortfolioLoadedStateModel(this.data);
+}
+
+
 
 

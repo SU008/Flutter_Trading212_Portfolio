@@ -7,6 +7,9 @@ abstract class T212ApiEvent {}
 
 class GetAccountDataEvent extends T212ApiEvent {}
 
+//using model
+class GetAccountDataEventModel extends T212ApiEvent {}
+
 class GetPersonalPortfolioEvent extends T212ApiEvent {}
 
 class GetHistoricalItemsEvent extends T212ApiEvent {}
