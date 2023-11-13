@@ -27,7 +27,7 @@ class T212ApiBloc extends Bloc<T212ApiEvent, T212ApiState> {
   }
 
   void _getAccountDataEventModel(GetAccountDataEventModel event, Emitter<T212ApiState> emit) async {
-    String tempAPI_key = '5035198ZLvgNiDKqcFzudYTVwdWnBEwCXsMU';
+    String tempAPI_key = 'Your_key';
 
     emit(LoadingState());
     var theUrl = Uri.parse('https://live.trading212.com/api/v0/equity/account/cash');
