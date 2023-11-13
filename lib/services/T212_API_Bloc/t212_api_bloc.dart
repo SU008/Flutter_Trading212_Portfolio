@@ -64,8 +64,8 @@ class T212ApiBloc extends Bloc<T212ApiEvent, T212ApiState> {
     }
   } catch (e) {
       print('failed to fetch data [e]');
-  emit(ErrorState());
-  print("Error decoding JSON or handling response: $e");
+      emit(ErrorState());
+      print("Error decoding JSON or handling response: $e");
   }
 
 

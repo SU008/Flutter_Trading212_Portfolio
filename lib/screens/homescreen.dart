@@ -42,7 +42,6 @@ class _MyHomePageState extends State<MyHomePage> {
               } else if (state is PersonalPortfolioLoadedStateModel) {
                 AccountCash accountcash = state.data;
 
-
                 print(accountcash);
                 return  Column(
                   children: [
@@ -83,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text('Portfolio : ${accountcash.invested + accountcash.ppl}'),
+                                      Text('Portfolio : ${accountcash.invested.toDouble() + accountcash.ppl.toDouble()}'),
                                       Text('Invested : ${accountcash.invested }'),
 
                                     ],
