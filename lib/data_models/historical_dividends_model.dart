@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:intl/intl.dart';
+
 class HistoricalDividends {
   List<Item>? items;
   String? nextPagePath;
@@ -50,15 +52,42 @@ class Item {
   String toRawJson() => json.encode(toJson());
 
   factory Item.fromJson(Map<String, dynamic> json) => Item(
-    ticker: json["ticker"]?? 'N/A',
+    ticker: json["ticker"]!= null ? _formatTicker(json["ticker"]) : 'N/A',
     reference: json["reference"] ?? 'N/A',
     quantity: json["quantity"]?.toDouble() ?? 0,
     amount: json["amount"]?.toDouble() ??0,
     grossAmountPerShare: json["grossAmountPerShare"]?.toDouble()??0,
     amountInEuro: json["amountInEuro"]?.toDouble()??0,
-    paidOn: json["paidOn"] == null ? null : DateTime.parse(json["paidOn"]),
+    paidOn: json["paidOn"] == null ? null : DateFormat('yyyy-MM-dd').parse(json["paidOn"]),
     type: json["type"],
   );
+
+  // Helper method to format date with only year, month, and day
+  //paidOn: json["paidOn"] == null ? null : formatDateTime(DateTime.parse(json["paidOn"])),
+  static DateTime formatDateTime(DateTime? dateTime) {
+    if (dateTime != null) {
+      // Create a new DateTime with only the date part
+
+
+      final newDateTime = DateTime(dateTime.year, dateTime.month, dateTime.day);
+
+      return newDateTime;
+    } else {
+      // Return null if the input is null
+      return DateTime(0, 0, 0);
+    }
+  }
+
+
+
+  // Helper method to format the ticker symbol
+  static String _formatTicker(String ticker) {
+    if (ticker.contains('_')) {
+      return ticker.split('_')[0];
+    } else {
+      return ticker;
+    }
+  }
 
   Map<String, dynamic> toJson() => {
     "ticker": ticker,
@@ -71,3 +100,17 @@ class Item {
     "type": type,
   };
 }
+
+/*
+//before formatting
+factory Item.fromJson(Map<String, dynamic> json) => Item(
+    ticker: json["ticker"]?? 'N/A',
+    reference: json["reference"] ?? 'N/A',
+    quantity: json["quantity"]?.toDouble() ?? 0,
+    amount: json["amount"]?.toDouble() ??0,
+    grossAmountPerShare: json["grossAmountPerShare"]?.toDouble()??0,
+    amountInEuro: json["amountInEuro"]?.toDouble()??0,
+    paidOn: json["paidOn"] == null ? null : DateTime.parse(json["paidOn"]),
+    type: json["type"],
+  );
+ */

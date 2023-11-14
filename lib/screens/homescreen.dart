@@ -37,7 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: () async {
           T212apibloc.add(GetAccountDataEventModel());
 
-          await Future.delayed(const Duration(milliseconds: 1000),);
+          await Future.delayed(const Duration(milliseconds: 100),);
 
           divbloc.add(GetPaidOutDividendsEventModel2());
         },
@@ -54,6 +54,7 @@ class ShowHistoricalDividends extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double containerWidth = MediaQuery.of(context).size.width;
     return Card(
       elevation: 5, // Optional: Add elevation for a shadow effect
       color: Colors.blue[200],
@@ -62,7 +63,7 @@ class ShowHistoricalDividends extends StatelessWidget {
             BorderRadius.circular(15.0), // Adjust the radius as needed
       ),
       child: Container(
-        height: 600,
+        height: 400,
         padding: const EdgeInsets.all(16.0),
         child: BlocBuilder<T212DividendBloc, T212DividendState>(
           builder: (context, state) {
@@ -75,18 +76,41 @@ class ShowHistoricalDividends extends StatelessWidget {
             } else if (state is PaidOutDividendsStateModel2) {
               HistoricalDividends divistory = state.data;
 
-              return ListView.builder(
-                itemCount: divistory.items?.length,
-                itemBuilder: (context, index) {
+              return Column(
+                    children: [
+                     Text('Dividends Recieved', textScaleFactor: 1),
+                     Expanded(
+                       child: ListView.builder(
+                        itemCount: divistory.items?.length,
+                        itemBuilder: (context, index) {
 
-                  Item dividend = divistory.items![index];
-                  return ListTile(
-                    leading: Text('${dividend.ticker}'),
-                    title: Text('Amount: ${dividend.amountInEuro}'),
-                    subtitle: Text('Date: ${dividend.paidOn}'),
+                          Item dividend = divistory.items![index];
+                          return ListTile(
+                            leading: Container(
+                              width: containerWidth*0.2,
+                              height: 50, // Set the height of the container
+                              decoration: BoxDecoration(
+                                color: Colors.blue,
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '${dividend.ticker}',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                            title: Text('Amount: ${dividend.amountInEuro}'),
+                            subtitle: Text('Date: ${dividend.paidOn}'),
+                            trailing: Text('data'),
+                          );
+                          },
+                         ),
+                     ),
+                     ],
                   );
-                },
-              );
+
+
 
             } else {
               return const Center(
