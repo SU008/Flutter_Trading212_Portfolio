@@ -28,8 +28,10 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             ShowAccountCash(),
             SizedBox(height: 5,),
-
             ShowHistoricalDividends(),
+
+
+
           ],
         ),
       ),
@@ -37,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: () async {
           T212apibloc.add(GetAccountDataEventModel());
 
-          await Future.delayed(const Duration(milliseconds: 100),);
+          await Future.delayed(const Duration(milliseconds: 10),);
 
           divbloc.add(GetPaidOutDividendsEventModel2());
         },
@@ -76,11 +78,28 @@ class ShowHistoricalDividends extends StatelessWidget {
             } else if (state is PaidOutDividendsStateModel2) {
               HistoricalDividends divistory = state.data;
 
-              return Column(
-                    children: [
-                     Text('Dividends Recieved', textScaleFactor: 1),
-                     Expanded(
-                       child: ListView.builder(
+              return
+                Column(
+                  children: [
+                    AspectRatio(aspectRatio: 16/9,
+                      child: Container(
+                        height: 10,
+                        color: Colors.red,
+                      ),
+                    ),
+
+
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Dividends Received', textScaleFactor: 1.2, textAlign: TextAlign.left,),
+                        Text('Amount ', textScaleFactor: 1.2, textAlign: TextAlign.left,),
+                      ],
+
+                    ),
+
+                    Expanded(
+                      child: ListView.builder(
                         itemCount: divistory.items?.length,
                         itemBuilder: (context, index) {
 
@@ -96,19 +115,19 @@ class ShowHistoricalDividends extends StatelessWidget {
                               child: Center(
                                 child: Text(
                                   '${dividend.ticker}',
-                                  style: TextStyle(color: Colors.white),
+                                  style: const TextStyle(color: Colors.white),
                                 ),
                               ),
                             ),
-                            title: Text('Amount: ${dividend.amountInEuro}'),
-                            subtitle: Text('Date: ${dividend.paidOn}'),
-                            trailing: Text('data'),
+                            subtitle: Text('Shares: ${dividend.quantity}'),
+                            title: Text('Date: ${dividend.paidOn}', overflow: TextOverflow.clip,maxLines: 1,),
+                            trailing: Text('${dividend.amountInEuro}'),
                           );
-                          },
-                         ),
-                     ),
-                     ],
-                  );
+                        },
+                      ),
+                    ),
+                  ],
+                );
 
 
 
@@ -145,7 +164,7 @@ class _ShowAccountCashState extends State<ShowAccountCash> {
             BorderRadius.circular(15.0), // Adjust the radius as needed
       ),
       child: Container(
-        height: 200,
+        height: 140,
         padding: const EdgeInsets.all(16.0),
         child: BlocBuilder<T212ApiBloc, T212ApiState>(
           builder: (context, state) {
@@ -169,10 +188,7 @@ class _ShowAccountCashState extends State<ShowAccountCash> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text(
-                          'Values shown are all approximate*',
-                          textScaleFactor: 0.8,
-                        ),
+                        Text('Values shown are all approximate*', textScaleFactor: 0.8,),
                       ],
                     ),
                   ),
@@ -181,8 +197,8 @@ class _ShowAccountCashState extends State<ShowAccountCash> {
                       borderRadius: BorderRadius.circular(
                           12.0), // Adjust the radius as needed
                     ),
-                    child: SizedBox(
-                      height: 90,
+                    child: Expanded(
+
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
@@ -194,6 +210,7 @@ class _ShowAccountCashState extends State<ShowAccountCash> {
                                 Text('Account Value : ${accountcash.total}'),
                               ],
                             ),
+                            SizedBox(height: 5,),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -214,7 +231,8 @@ class _ShowAccountCashState extends State<ShowAccountCash> {
                                   ],
                                 ),
                               ],
-                            )
+                            ),
+                            SizedBox(height: 5,),
                           ],
                         ),
                       ),
