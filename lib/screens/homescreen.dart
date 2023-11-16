@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_portfolio_dividend/data_models/historical_dividends_model.dart';
+import 'package:flutter_portfolio_dividend/data_models/open_positions_model.dart';
+import 'package:flutter_portfolio_dividend/services/T212_API_OpenPositions_Bloc/t212_API_openpositions_bloc.dart';
+import 'package:flutter_portfolio_dividend/widgets/Dividend_plot.dart';
 import 'package:intl/intl.dart';
 import '../data_models/account_cash_model.dart';
 import '../services/T212_API_Bloc/t212_api_bloc.dart';
 import '../services/T212_API_Divided_Bloc/t212_dividend_bloc.dart';
+import '../widgets/Dividend_plot_usingSyncFusion.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -17,18 +21,28 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final T212ApiBloc T212apibloc = BlocProvider.of<T212ApiBloc>(context);
     final T212DividendBloc divbloc = BlocProvider.of<T212DividendBloc>(context);
+    final ApiOpenPositionsBloc openpositionsbloc = BlocProvider.of<ApiOpenPositionsBloc>(context);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Trading 212 Portfolio'),
       ),
       body: const SingleChildScrollView(
+        scrollDirection: Axis.vertical,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ShowAccountCash(),
             SizedBox(height: 5,),
+            ShowOpenPositions(),
+            SizedBox(height: 5,),
             ShowHistoricalDividends(),
+
+
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SizedBox(width: 700,child: Placeholder()),
+            ),
 
 
 
@@ -39,15 +53,110 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: () async {
           T212apibloc.add(GetAccountDataEventModel());
 
-          await Future.delayed(const Duration(milliseconds: 10),);
+          await Future.delayed(const Duration(milliseconds: 1000),);
 
           divbloc.add(GetPaidOutDividendsEventModel2());
+          await Future.delayed(const Duration(milliseconds: 1000),);
+
+          openpositionsbloc.add(FetchDataOpenPositionsEvent());
+
         },
         child: const Icon(Icons.refresh),
       ),
     );
   }
 }
+
+
+
+class ShowOpenPositions extends StatelessWidget {
+  const ShowOpenPositions({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    double containerWidth = MediaQuery.of(context).size.width;
+    return Card(
+      elevation: 5, // Optional: Add elevation for a shadow effect
+      color: Colors.blue[200],
+      shape: RoundedRectangleBorder(
+        borderRadius:
+        BorderRadius.circular(15.0), // Adjust the radius as needed
+      ),
+      child: Container(
+        height: 600,
+        padding: const EdgeInsets.all(16.0),
+        child: BlocBuilder<ApiOpenPositionsBloc, ApiOpenPositionsState>(
+          builder: (context, state) {
+            if (state is ErrorState2) {
+              const Center(child: Text('Error while fetch data'));
+            }
+
+            if (state is LoadingState3) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is DataLoadedOpenPositionsState) {
+              OpenPositionsList myOpenPos = state.data;
+
+              return
+                Column(
+                  children: [
+                    const SizedBox(height: 3,),
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Positions', textScaleFactor: 1.2, textAlign: TextAlign.left,),
+                        Text('Current Price ', textScaleFactor: 1.2, textAlign: TextAlign.left,),
+                      ],
+
+                    ),
+                    const SizedBox(height: 4,),
+
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: myOpenPos.openPositions.length,
+                        itemBuilder: (context, index) {
+
+                          OpenPosition myPosition = myOpenPos.openPositions[index];
+                          return ListTile(
+                            leading:  Container(
+                              width: containerWidth*0.2,
+                              height: 50, // Set the height of the container
+                              decoration: BoxDecoration(
+                                color: Colors.blue,
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '${myPosition.ticker}',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                            subtitle: Text('Quantity: ${myPosition.quantity}'),
+                            title: Text('Avg Price: ${myPosition.averagePrice}', overflow: TextOverflow.clip,maxLines: 1,),
+                            trailing: Text('${myPosition.currentPrice}'),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+
+            } else {
+              return const Center(
+                  child: Text(
+                      'Enter API Key/Press the button to fetch data'));
+            }
+          },
+        ),
+      ),
+    );
+  }
+}
+
+
+
 
 class ShowHistoricalDividends extends StatelessWidget {
   const ShowHistoricalDividends({
@@ -65,7 +174,7 @@ class ShowHistoricalDividends extends StatelessWidget {
             BorderRadius.circular(15.0), // Adjust the radius as needed
       ),
       child: Container(
-        height: 400,
+        height: 600,
         padding: const EdgeInsets.all(16.0),
         child: BlocBuilder<T212DividendBloc, T212DividendState>(
           builder: (context, state) {
@@ -81,22 +190,36 @@ class ShowHistoricalDividends extends StatelessWidget {
               return
                 Column(
                   children: [
-                    AspectRatio(aspectRatio: 16/9,
+
+                    /*
+                    AspectRatio(aspectRatio: 16/10,
                       child: Container(
-                        height: 10,
+                        height: 100,
                         color: Colors.red,
+                        child: HistoricalDividendsChartCard2(dividends: divistory ),
                       ),
                     ),
+
+                     */
+
+
+
+
+
+
+
+                    const SizedBox(height: 3,),
 
 
                     const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Dividends Received', textScaleFactor: 1.2, textAlign: TextAlign.left,),
+                        Text('Latest 50 Dividends', textScaleFactor: 1.2, textAlign: TextAlign.left,),
                         Text('Amount ', textScaleFactor: 1.2, textAlign: TextAlign.left,),
                       ],
 
                     ),
+                    const SizedBox(height: 4,),
 
                     Expanded(
                       child: ListView.builder(
@@ -105,7 +228,7 @@ class ShowHistoricalDividends extends StatelessWidget {
 
                           Item dividend = divistory.items![index];
                           return ListTile(
-                            leading: Container(
+                            leading:  Container(
                               width: containerWidth*0.2,
                               height: 50, // Set the height of the container
                               decoration: BoxDecoration(
@@ -128,8 +251,6 @@ class ShowHistoricalDividends extends StatelessWidget {
                     ),
                   ],
                 );
-
-
 
             } else {
               return const Center(
@@ -250,4 +371,6 @@ class _ShowAccountCashState extends State<ShowAccountCash> {
     );
   }
 }
+
+
 
