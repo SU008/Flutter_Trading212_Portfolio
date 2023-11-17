@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_portfolio_dividend/data_models/historical_dividends_model.dart';
@@ -5,6 +7,7 @@ import 'package:flutter_portfolio_dividend/data_models/open_positions_model.dart
 import 'package:flutter_portfolio_dividend/services/T212_API_OpenPositions_Bloc/t212_API_openpositions_bloc.dart';
 import 'package:flutter_portfolio_dividend/widgets/Dividend_plot.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 import '../data_models/account_cash_model.dart';
 import '../services/T212_API_Bloc/t212_api_bloc.dart';
 import '../services/T212_API_Divided_Bloc/t212_dividend_bloc.dart';
@@ -15,8 +18,23 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+//error, loaded, default, fail
+
 //testing with model
 class _MyHomePageState extends State<MyHomePage> {
+
+
+
+
+
+
+  @override
+  void initState() {
+    super.initState();
+
+
+  }
+
   @override
   Widget build(BuildContext context) {
     final T212ApiBloc T212apibloc = BlocProvider.of<T212ApiBloc>(context);
@@ -27,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: const Text('Trading 212 Portfolio'),
       ),
-      body: const SingleChildScrollView(
+      body:  const SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -37,6 +55,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ShowOpenPositions(),
             SizedBox(height: 5,),
             ShowHistoricalDividends(),
+
+
+
 
 
             SingleChildScrollView(
@@ -65,6 +86,17 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
+
+
+
+
+
+
+
+
+
+
 }
 
 
@@ -73,6 +105,66 @@ class ShowOpenPositions extends StatelessWidget {
   const ShowOpenPositions({
     super.key,
   });
+
+
+  Widget buildOpenPositionsShimmer( context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.black12,
+      highlightColor: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: 50,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Column(
+                children: [
+                      Container( //box
+                      width: MediaQuery.of(context).size.width*0.23,
+                      height: MediaQuery.of(context).size.height*0.06, // Set the height of the container
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(8.0),
+                       ),
+                      ),
+                ],
+              ),
+              const SizedBox(width: 10,),
+
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container( //first top row in the centre
+                    width:MediaQuery.of(context).size.width*0.5,
+                    height: MediaQuery.of(context).size.height*0.02, // Set the height of the container
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  const SizedBox(height: 5,),
+                  Container(//next top row in the centre
+                    width: MediaQuery.of(context).size.width*0.3,
+                    height: MediaQuery.of(context).size.height*0.02, // Set the height of the container
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                ],
+              ),
+
+
+            ],
+          ),
+        ),
+      )
+    );
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +178,7 @@ class ShowOpenPositions extends StatelessWidget {
       ),
       child: Container(
         height: 600,
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(10.0),
         child: BlocBuilder<ApiOpenPositionsBloc, ApiOpenPositionsState>(
           builder: (context, state) {
             if (state is ErrorState2) {
@@ -94,7 +186,17 @@ class ShowOpenPositions extends StatelessWidget {
             }
 
             if (state is LoadingState3) {
-              return const Center(child: CircularProgressIndicator());
+              //return const Center(child: CircularProgressIndicator());
+              return ListView.builder(
+                  itemCount: 8,
+                  itemBuilder: (context, index){
+                    return buildOpenPositionsShimmer(context);
+
+                  },
+              );
+
+
+
             } else if (state is DataLoadedOpenPositionsState) {
               OpenPositionsList myOpenPos = state.data;
 
@@ -120,7 +222,7 @@ class ShowOpenPositions extends StatelessWidget {
                           OpenPosition myPosition = myOpenPos.openPositions[index];
                           return ListTile(
                             leading:  Container(
-                              width: containerWidth*0.2,
+                              width: containerWidth*0.23,
                               height: 50, // Set the height of the container
                               decoration: BoxDecoration(
                                 color: Colors.blue,
@@ -128,14 +230,14 @@ class ShowOpenPositions extends StatelessWidget {
                               ),
                               child: Center(
                                 child: Text(
-                                  '${myPosition.ticker}',
+                                  '${myPosition.ticker}',overflow: TextOverflow.ellipsis,maxLines: 1,
                                   style: const TextStyle(color: Colors.white),
                                 ),
                               ),
                             ),
-                            subtitle: Text('Quantity: ${myPosition.quantity}'),
-                            title: Text('Avg Price: ${myPosition.averagePrice}', overflow: TextOverflow.clip,maxLines: 1,),
-                            trailing: Text('${myPosition.currentPrice}'),
+                            subtitle: Text('Shares: ${myPosition.quantity}',overflow: TextOverflow.ellipsis,maxLines: 1,),
+                            title: Text('Avg Price: ${myPosition.averagePrice?.toStringAsFixed(2)}',overflow: TextOverflow.ellipsis,maxLines: 1,),
+                            trailing: Text('${myPosition.currentPrice}', textAlign: TextAlign.right,),
                           );
                         },
                       ),
@@ -157,11 +259,72 @@ class ShowOpenPositions extends StatelessWidget {
 
 
 
-
 class ShowHistoricalDividends extends StatelessWidget {
+
   const ShowHistoricalDividends({
     super.key,
   });
+
+
+  Widget buildHistoricalDividendsShimmer( context) {
+    return Shimmer.fromColors(
+        baseColor: Colors.black12,
+        highlightColor: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: 50,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Column(
+                  children: [
+                    Container( //box
+                      width: MediaQuery.of(context).size.width*0.23,
+                      height: MediaQuery.of(context).size.height*0.06, // Set the height of the container
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 10,),
+
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container( //first top row in the centre
+                      width:MediaQuery.of(context).size.width*0.5,
+                      height: MediaQuery.of(context).size.height*0.02, // Set the height of the container
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    const SizedBox(height: 5,),
+                    Container(//next top row in the centre
+                      width: MediaQuery.of(context).size.width*0.3,
+                      height: MediaQuery.of(context).size.height*0.02, // Set the height of the container
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                  ],
+                ),
+
+
+              ],
+            ),
+          ),
+        )
+    );
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -179,13 +342,23 @@ class ShowHistoricalDividends extends StatelessWidget {
         child: BlocBuilder<T212DividendBloc, T212DividendState>(
           builder: (context, state) {
             if (state is ErrorState) {
+
               const Center(child: Text('Error while fetch data'));
             }
 
-            if (state is LoadingState) {
-              return const Center(child: CircularProgressIndicator());
+            if (state is LoadingState2) {
+              //return const Center(child: CircularProgressIndicator());
+              return ListView.builder(
+                itemCount: 8,
+                itemBuilder: (context, index){
+                  return buildHistoricalDividendsShimmer(context);
+
+                },
+              );
             } else if (state is PaidOutDividendsStateModel2) {
               HistoricalDividends divistory = state.data;
+
+
 
               return
                 Column(

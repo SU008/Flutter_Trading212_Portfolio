@@ -48,6 +48,8 @@ class ApiOpenPositionsBloc extends Bloc<ApiOpenPositionsEvent, ApiOpenPositionsS
       Emitter<ApiOpenPositionsState> emit) async {
     emit(LoadingState3());
 
+    await Future.delayed(const Duration(milliseconds: 5000),);
+
     await dotenv.load(); //done in main.dart instead
     String tempAPI_key = dotenv.env['API_KEY'] ?? "Your_API_Key_During_Testing";
 

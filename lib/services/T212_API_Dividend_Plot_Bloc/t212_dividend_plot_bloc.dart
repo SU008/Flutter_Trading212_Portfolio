@@ -44,6 +44,7 @@ class ApiBloc extends Bloc<ApiEvent, ApiState> {
   void _onFetchDataEvent(FetchDataEvent event, Emitter<ApiState> emit) async {
     emit(LoadingState());
 
+
     try {
       final response = await http.get(Uri.parse(apiUrl));
 

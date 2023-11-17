@@ -21,6 +21,7 @@ class T212DividendBloc extends Bloc<T212DividendEvent, T212DividendState> {
 
   void _getPaidOutDividendsEventModel2(GetPaidOutDividendsEventModel2 event, Emitter<T212DividendState> emit) async {
     emit(LoadingState2());
+    await Future.delayed(const Duration(milliseconds: 5000),);
 
     await dotenv.load(); //done in main.dart instead
     String tempAPI_key = dotenv.env['API_KEY'] ?? "Your_API_Key_During_Testing";
