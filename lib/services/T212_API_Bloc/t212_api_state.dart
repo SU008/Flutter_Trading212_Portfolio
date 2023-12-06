@@ -41,3 +41,10 @@ class PaidOutDividendsStateModel extends T212ApiState {
 }
 //-----------------------------------
 
+
+//--openpositions
+class DataLoadedOpenPositionsState90 extends T212ApiState {
+  final OpenPositionsList data;
+
+  DataLoadedOpenPositionsState90(this.data);
+}

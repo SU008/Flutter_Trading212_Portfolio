@@ -37,13 +37,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final T212ApiBloc T212apibloc = BlocProvider.of<T212ApiBloc>(context);
-    final T212DividendBloc divbloc = BlocProvider.of<T212DividendBloc>(context);
-    final ApiOpenPositionsBloc openpositionsbloc = BlocProvider.of<ApiOpenPositionsBloc>(context);
+    final T212ApiBloc T212apibloc = BlocProvider.of<T212ApiBloc>(context, listen: true);
+    final T212DividendBloc divbloc = BlocProvider.of<T212DividendBloc>(context,listen: true);
+    final ApiOpenPositionsBloc openpositionsbloc = BlocProvider.of<ApiOpenPositionsBloc>(context,listen: true);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Trading 212 Portfolio'),
+        title: const Center(child: Text('Trading 212 Portfolio')),
       ),
       body:  const SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -257,8 +257,6 @@ class ShowOpenPositions extends StatelessWidget {
   }
 }
 
-
-
 class ShowHistoricalDividends extends StatelessWidget {
 
   const ShowHistoricalDividends({
@@ -437,17 +435,11 @@ class ShowHistoricalDividends extends StatelessWidget {
   }
 }
 
-
-
-class ShowAccountCash extends StatefulWidget {
+class ShowAccountCash extends StatelessWidget {
   const ShowAccountCash({
     super.key,
   });
 
-  @override
-  State<ShowAccountCash> createState() => _ShowAccountCashState();
-}
-class _ShowAccountCashState extends State<ShowAccountCash> {
   @override
   Widget build(BuildContext context) {
     return Card(

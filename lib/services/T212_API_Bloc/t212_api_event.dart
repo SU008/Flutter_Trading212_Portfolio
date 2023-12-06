@@ -16,3 +16,6 @@ class GetHistoricalItemsEvent extends T212ApiEvent {}
 
 class GetPaidOutDividendsEvent extends T212ApiEvent {}
 class GetPaidOutDividendsEventModel extends T212ApiEvent {}
+
+
+class FetchDataOpenPositionsEvent1 extends T212ApiEvent {}

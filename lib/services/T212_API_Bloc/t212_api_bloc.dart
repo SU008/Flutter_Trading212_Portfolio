@@ -12,6 +12,7 @@ import 'package:easy_debounce/easy_debounce.dart';//debounce
 
 
 import '../../data_models/account_cash_model.dart';
+import '../../data_models/open_positions_model.dart';
 
 
 part 't212_api_event.dart';
@@ -27,13 +28,65 @@ class T212ApiBloc extends Bloc<T212ApiEvent, T212ApiState> {
     on<GetAccountDataEvent>(_getAccountDataEvent);
     on<GetAccountDataEventModel>(_getAccountDataEventModel);//useing data model
 
-    on<GetPaidOutDividendsEventModel>(_getPaidOutDividendsEventModel);
+    on<GetPaidOutDividendsEventModel>(_getPaidOutDividendsEventModel); //copied
+
+    on<FetchDataOpenPositionsEvent1>(_onFetchDataOpenPositionsEvent);//copied
 
 
   }
 
+
+  void _onFetchDataOpenPositionsEvent(FetchDataOpenPositionsEvent1 event, Emitter<T212ApiState> emit) async {
+    emit(LoadingState());
+
+    await Future.delayed(const Duration(milliseconds: 5000),);
+
+    await dotenv.load(); //done in main.dart instead
+    String tempAPI_key = dotenv.env['API_KEY'] ?? "Your_API_Key_During_Testing";
+
+
+    var targetHeaders = {
+      "Authorization": tempAPI_key,
+      "Content-Type": "application/json",
+    };
+
+    Uri theUrl = Uri.parse(
+        'https://live.trading212.com/api/v0/equity/portfolio');
+
+
+    final response = await http.get(
+        theUrl, headers: targetHeaders); //sending a get
+    print('Open Positions response code: ${response.statusCode}');
+
+    try {
+      if (response.statusCode == 200) {
+        // Decode the JSON response into an instance of AccountCash
+
+        //List<Map<String, dynamic>> data = json.decode(response.body);
+
+        OpenPositionsList myOpenposition = OpenPositionsList.fromJson(json.decode(response.body));
+
+        //final Map<String, dynamic> data = json.decode(response.body);
+        print("OpenPositions map data: ${myOpenposition}");
+
+
+        emit(DataLoadedOpenPositionsState90(myOpenposition));
+      } else {
+        print('failed to fetch data');
+        throw Exception("Failed to fetch data: ${response.statusCode}");
+      }
+    } catch (e) {
+      print('failed to fetch data [e]');
+
+      print("Error decoding JSON or handling response: $e");
+    }
+  }
+
+
+
   void _getPaidOutDividendsEventModel(GetPaidOutDividendsEventModel event, Emitter<T212ApiState> emit) async {
     emit(LoadingState());
+    await Future.delayed(const Duration(milliseconds: 5000),);
 
     await dotenv.load(); //done in main.dart instead
     String tempAPI_key = dotenv.env['API_KEY'] ?? "Your_API_Key_During_Testing";
@@ -68,20 +121,15 @@ class T212ApiBloc extends Bloc<T212ApiEvent, T212ApiState> {
         emit(PaidOutDividendsStateModel(divhistory));
 
       } else {
-        emit(ErrorState());
+
         print('failed to fetch data');
         throw Exception("Failed to fetch data: ${response.statusCode}");
       }
     } catch (e) {
       print('failed to fetch data [e]');
-      emit(ErrorState());
+
       print("Error decoding JSON or handling response: $e");
     }
-
-
-
-
-
 
   }
 
